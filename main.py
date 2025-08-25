@@ -16,8 +16,6 @@ def save_login(token_type, access_token, expiry_time, refresh_token): #meow
         f.write(f'{refresh_token}\n')
         f.write(f'valid\n')
         # shiko shiko shiko shiko shiko shiko
-        # ok am inteles si oricand vreau pot sa intru? sau tre sa ai si tu deschis
-        # nu cred ca tre sa il am deschis k staus tai sa incercam
 
 #login :3
 if os.path.getsize('credentials.ini') != 0:
