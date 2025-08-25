@@ -4,7 +4,7 @@ import os
 import pypresence
 
 session = tidalapi.Session()
-
+track = session.track()
 
 def login_saved(token_type, access_token, expiry_time, refresh_token): #functia asta nesimtita ca mi e lene sa fac altfel
     session.load_oauth_session(token_type, access_token, expiry_time, refresh_token)
@@ -42,3 +42,8 @@ session_id = session.session_id
 user = session.user
 user_id = user.id
 print(user.id)
+
+artist = track.artist
+print(artist)
+name = track.name
+print(name)
