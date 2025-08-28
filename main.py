@@ -27,23 +27,22 @@ if os.path.getsize('credentials.ini') != 0:
         refresh_token = lines[3].strip()
         valid = lines[4].strip()
         login_saved(token_type, access_token, expiry_time, refresh_token)
-        print(session.load_oauth_session(token_type, access_token, refresh_token, expiry_time))
+        print(session.check_login())
 else:
        session.login_oauth_simple()
        token_type = session.token_type
        access_token = session.access_token
        expiry_time = session.expiry_time
        refresh_token = session.refresh_token
-       print(session.load_oauth_session(token_type, access_token, refresh_token, expiry_time))
        save_login(token_type, access_token, expiry_time, refresh_token)
+       print(session.check_login())
 
 home = session.home()
 session_id = session.session_id
 user = session.user
 user_id = user.id
 print(user.id)
-
-artist = track.artist
+artist = track.id
 print(artist)
 name = track.name
 print(name)
