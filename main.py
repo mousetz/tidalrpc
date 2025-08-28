@@ -1,10 +1,34 @@
 import tidalapi
 from plyer import notification
+from pywinauto import Desktop
+import psutil
 import os
 import pypresence
+import time
 
 session = tidalapi.Session()
 track = session.track()
+
+def check_for_tidal():
+    json_return = {
+        'open': False,
+        'playing': False,
+        'song_playing': None,
+    }
+    windows = Desktop(backend="uia").windows()
+    for w in windows:
+        p_id = w.process_id()  
+        process = psutil.Process(p_id)  
+        if 'tidal' in process.name().lower():  
+            json_return['open'] = True
+            if w.window_text() == 'TIDAL':
+                json_return['playing'] = False
+                return json_return
+            json_return['playing'] = True
+            json_return['song_playing'] = w.window_text()
+            return json_return
+    return json_return
+
 
 def login_saved(token_type, access_token, expiry_time, refresh_token): #functia asta nesimtita ca mi e lene sa fac altfel
     session.load_oauth_session(token_type, access_token, expiry_time, refresh_token)
@@ -16,6 +40,8 @@ def save_login(token_type, access_token, expiry_time, refresh_token): #meow
         f.write(f'{refresh_token}\n')
         f.write(f'valid\n')
         # shiko shiko shiko shiko shiko shiko
+
+
 
 #login :3
 if os.path.getsize('credentials.ini') != 0:
@@ -37,7 +63,55 @@ else:
        save_login(token_type, access_token, expiry_time, refresh_token)
        print(session.check_login())
 
-home = session.home()
+session_id = session.session_id
+song = session.search(check_for_tidal()['song_playing'])['top_hit']
+
+artists = (
+    [artist.name for artist in song.artists if artist.name is not None]
+    if song.artists
+    else None
+)
+
+album = song.album.name
+print(album)
+ 
+def start_rpc():
+    client_id = 1410728956579283117
+    rpc = pypresence.Presence(client_id)
+    rpc.connect()
+    rpc.update(
+                #activity_type=pypresence.ActivityType.LISTENING,
+                details=", ".join(artists),
+                state=song.album.name,
+                large_image=song.album.image(),
+                large_text=song.album.name,
+                start=int(time.time()),
+                end=int(time.time() + song.duration)
+                if song.duration else None
+            ) 
+ 
+
+
+
+
+if song:
+    print(f'Id: {song.id}')
+    print(f'song: {song.name}')
+    print(f'artist: {artists}')
+    minutes, seconds = divmod(song.duration, 60)
+    print(f'Duration (mm:ss): {minutes}:{seconds:02d}')
+    print(f'Duration (seconds): {song.duration}')
+    start_rpc()
+    while True:
+        time.sleep(0.1)
+
+
+print(artists)
+
+
+
+
+'''home = session.home()
 session_id = session.session_id
 user = session.user
 user_id = user.id
@@ -46,3 +120,5 @@ artist = track.id
 print(artist)
 name = track.name
 print(name)
+'''
+
