@@ -5,7 +5,8 @@ import psutil
 import os
 import pypresence
 import time
-
+import logging
+import threading
 session = tidalapi.Session()
 track = session.track()
 
@@ -41,7 +42,7 @@ def save_login(token_type, access_token, expiry_time, refresh_token): #meow
         f.write(f'valid\n')
         # shiko shiko shiko shiko shiko shiko
 
-
+offset = 0
 
 #login :3
 if os.path.getsize('credentials.ini') != 0:
@@ -74,21 +75,34 @@ artists = (
 
 album = song.album.name
 print(album)
- 
+
 def start_rpc():
-    client_id = 1410728956579283117
+    client_id = 1407686593812103168
     rpc = pypresence.Presence(client_id)
     rpc.connect()
     rpc.update(
-                #activity_type=pypresence.ActivityType.LISTENING,
-                details=", ".join(artists),
-                state=song.album.name,
-                large_image=song.album.image(),
-                large_text=song.album.name,
-                start=int(time.time()),
-                end=int(time.time() + song.duration)
-                if song.duration else None
-            ) 
+                activity_type=pypresence.ActivityType.LISTENING,
+                details=song.name,
+                state=", ".join(artists) if artists else "Unknown Artist",
+                large_image=song.album.image() if song.album else "hightide_x1024",
+                large_text=song.album.name if song.album else "DiscordRPC",
+                small_image=song.artists[0].image() if song.album else None,
+                small_text="DiscordRPC" if song.album else None,
+                start=int(time.time()) - offset,
+                end=int(time.time() + song.duration) if song.duration else None
+                if song.duration
+                else None,
+                buttons=[
+                    {
+                        "label": "Listen to " + song.name,
+                        "url": f"https://tidal.com/track/{song.id}"
+                    },
+                    {
+                        "label": "Get DiscordRPC",
+                        "url": "https://github.com/mousetz/tidalrpc",
+                    },
+                ]
+            )
  
 
 
