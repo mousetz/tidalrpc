@@ -1,3 +1,4 @@
+from PySide6.QtCore import QTimer
 import tidalapi
 from plyer import notification
 from pywinauto import Desktop
@@ -6,6 +7,11 @@ import os
 import pypresence
 import time
 import logging
+from ui import create_window,on_toggle_show_artist
+from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QWidget , QVBoxLayout
+from PySide6.QtCore import Qt,QFile
+from PySide6.QtUiTools import QUiLoader
+import configparser
 
 session = tidalapi.Session()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s') 
@@ -88,6 +94,7 @@ else:
 client_id = 1411287876062416908
 rpc = pypresence.Presence(client_id)
 rpc.connect()
+show_artist=True
 
 def update_rpc(song):
     if not song:
@@ -98,7 +105,10 @@ def update_rpc(song):
         if song.artists
         else None
     )
-    
+    config=configparser.ConfigParser()
+    config.read("settings.ini")
+    my_list_str=config["UI"]["my_list"].split(",")
+    my_list=[s == "True" if s in ["True","False"] else int(s) for s in my_list_str]
     try:
         rpc.update(
             activity_type=pypresence.ActivityType.LISTENING,
@@ -106,7 +116,7 @@ def update_rpc(song):
             state=", ".join(artists) if artists else "Unknown Artist",
             large_image=song.album.image() if song.album else "hightide_x1024",
             large_text=song.album.name if song.album else "DiscordRPC",
-            small_image=song.artists[0].image() if song.album and song.artists and song.artists[0].image()!="https://resources.tidal.com/images/1e01cdb6/f15d/4d8b/8440/a047976c1cac/320x320.jpg" else "tidal",
+            small_image=song.artists[0].image() if my_list[0] and song.album and song.artists and song.artists[0].image()!="https://resources.tidal.com/images/1e01cdb6/f15d/4d8b/8440/a047976c1cac/320x320.jpg" else None,
             small_text="DiscordRPC" if song.album else None,
             start=int(time.time() + 0.5),
             end=int(time.time() + song.duration) if song.duration else None,
@@ -119,44 +129,44 @@ def update_rpc(song):
                     "label": "Get DiscordRPC",
                     "url": "https://github.com/mousetz/tidalrpc",
                 },
-            ]
+            ] if my_list[1] else None
         )
         logger.info(f"RPC updated: {song.name} by {", ".join(artists)}")
     except Exception as e:
         logger.error(f"Error updating RPC: {e}")
 
-
- 
-
+previous_song_id = None
+def tick():
+    global previous_song_id
+    try:
+        current_song = get_song()
+        
+        if current_song:
+            if not previous_song_id or current_song.id != previous_song_id and current_song:
+                artists = (
+                    [artist.name for artist in current_song.artists if artist.name is not None]
+                    if current_song.artists
+                    else None
+                )
+                
+                
+                update_rpc(current_song)
+                previous_song_id = current_song.id
+        else:
+            previous_song_id = None
+            logger.info("No song currently playing")
+    except Exception as e:
+        logger.error(f"Error in main loop: {e}")
+        
 
 
 def main():
-    previous_song_id = None
+    window, app = create_window()
+    window.show()
+    timer = QTimer()
+    timer.timeout.connect(tick) 
+    timer.start(1000) 
+    app.exec()
     
-    while True:
-        try:
-            current_song = get_song()
-            
-            if current_song:
-                if not previous_song_id or current_song.id != previous_song_id and current_song:
-                    artists = (
-                        [artist.name for artist in current_song.artists if artist.name is not None]
-                        if current_song.artists
-                        else None
-                    )
-                    
-                    
-                    update_rpc(current_song)
-                    previous_song_id = current_song.id
-            else:
-                previous_song_id = None
-                logger.info("No song currently playing")
-                time.sleep(2)
-            
-            time.sleep(1)
-            
-        except Exception as e:
-            logger.error(f"Error in main loop: {e}")
-            time.sleep(5)
 
 main()
