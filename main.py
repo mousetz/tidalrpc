@@ -106,7 +106,7 @@ def update_rpc(song):
             state=", ".join(artists) if artists else "Unknown Artist",
             large_image=song.album.image() if song.album else "hightide_x1024",
             large_text=song.album.name if song.album else "DiscordRPC",
-            small_image=song.artists[0].image() if song.album and song.artists else None,
+            small_image=song.artists[0].image() if song.album and song.artists and song.artists[0].image()!="https://resources.tidal.com/images/1e01cdb6/f15d/4d8b/8440/a047976c1cac/320x320.jpg" else "tidal",
             small_text="DiscordRPC" if song.album else None,
             start=int(time.time() + 0.5),
             end=int(time.time() + song.duration) if song.duration else None,
@@ -149,8 +149,9 @@ def main():
                     update_rpc(current_song)
                     previous_song_id = current_song.id
             else:
-                logger.info("No song currently playing")
                 previous_song_id = None
+                logger.info("No song currently playing")
+                time.sleep(2)
             
             time.sleep(1)
             
