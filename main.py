@@ -123,7 +123,7 @@ def update_rpc(song):
             buttons=[
                 {
                     "label": "Listen to the song",
-                    "url": f"https://tidal.com/track/{song.id}"
+                    "url": f"https://tidal.com/browse/track/{song.id}?u"
                 },
                 {
                     "label": "Get DiscordRPC",
