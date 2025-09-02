@@ -34,7 +34,6 @@ def create_window():
     file.open(QFile.ReadOnly)
     window=loader.load(file)
     file.close()
-    window.comboBox.addItems(["Listening to TIDAL", "Listening to [Artist Name]","Listening to [Track Name]"])
 
     #set default variables for check_box
     config=configparser.ConfigParser()
