@@ -7,7 +7,7 @@ import os
 import pypresence
 import time
 import logging
-from ui import create_window,on_toggle_show_artist
+from ui import create_window,on_toggle_show_artist,show_popup
 from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QWidget , QVBoxLayout
 from PySide6.QtCore import Qt,QFile
 from PySide6.QtUiTools import QUiLoader
@@ -167,6 +167,8 @@ def main():
     timer.timeout.connect(tick) 
     timer.start(1000) 
     app.exec()
+    
+
     
 
 main()

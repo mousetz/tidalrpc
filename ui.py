@@ -1,7 +1,8 @@
 from logging import config
-from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QWidget , QVBoxLayout
+from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QWidget , QVBoxLayout,QMessageBox
 from PySide6.QtCore import Qt,QFile
 from PySide6.QtUiTools import QUiLoader
+from PySide6.QtGui import QIcon
 import configparser
 
 
@@ -43,8 +44,16 @@ def create_window():
     window.checkBox.setChecked(my_list[0])
     window.checkBox_2.setChecked(my_list[1])
 
-
+    window.setWindowIcon(QIcon("tidal_icon.png"))
     window.checkBox.toggled.connect(on_toggle_show_artist)
     window.checkBox_2.toggled.connect(on_toggle_show_buttons)
+
+    show_popup("TEST")
+
     return window,app
 
+def show_popup(message):
+    msg = QMessageBox()
+    msg.setWindowTitle("Not logged in!")
+    msg.setText(message)
+    msg.exec()  
