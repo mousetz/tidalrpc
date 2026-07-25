@@ -6,64 +6,361 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>222</width>
-    <height>70</height>
+    <width>460</width>
+    <height>580</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>460</width>
+    <height>580</height>
+   </size>
+  </property>
   <property name="windowTitle">
-   <string>TidalRpc</string>
+   <string>TIDAL RPC</string>
   </property>
-  <property name="windowOpacity">
-   <double>1.000000000000000</double>
-  </property>
-  <property name="toolButtonStyle">
-   <enum>Qt::ToolButtonIconOnly</enum>
-  </property>
-  <property name="tabShape">
-   <enum>QTabWidget::Rounded</enum>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow, QWidget {
+    background: #0b0b0d;
+    color: #f5f5f7;
+    font-family: "Segoe UI";
+    font-size: 10pt;
+}
+QLabel, QCheckBox {
+    background: transparent;
+}
+QLabel#titleLabel {
+    font-size: 22pt;
+    font-weight: 700;
+}
+QLabel#subtitleLabel, QLabel#artistLabel {
+    color: #a7a7ad;
+}
+QLabel#trackLabel {
+    font-size: 15pt;
+    font-weight: 600;
+}
+QLabel#overallStatusLabel {
+    color: #b7b7bd;
+    padding: 2px 0;
+}
+QLabel#overallStatusLabel[state="error"] {
+    color: #ff7777;
+}
+QFrame#statusCard, QGroupBox {
+    background: #151519;
+    border: 1px solid #29292f;
+    border-radius: 10px;
+}
+QGroupBox {
+    font-weight: 600;
+    margin-top: 10px;
+    padding-top: 12px;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 12px;
+    padding: 0 4px;
+}
+QLabel#tidalStatusLabel, QLabel#rpcStatusLabel {
+    border-radius: 8px;
+    padding: 4px 9px;
+    font-size: 9pt;
+    font-weight: 600;
+}
+QLabel[state="connected"] {
+    background: #123b2b;
+    color: #72e6ae;
+}
+QLabel[state="paused"], QLabel[state="waiting"], QLabel[state="missing"] {
+    background: #303038;
+    color: #c7c7cd;
+}
+QLabel[state="disabled"] {
+    background: #27272d;
+    color: #8c8c94;
+}
+QLabel[state="error"] {
+    background: #442326;
+    color: #ff8b91;
+}
+QCheckBox {
+    spacing: 9px;
+    padding: 5px 0;
+}
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+}
+QCheckBox::indicator:unchecked {
+    border: 1px solid #55555d;
+    border-radius: 5px;
+    background: #202025;
+}
+QCheckBox::indicator:checked {
+    border: 1px solid #28a7ff;
+    border-radius: 5px;
+    background: #129cff;
+}
+QCheckBox:disabled {
+    color: #6f6f76;
+}
+QPushButton {
+    background: #f5f5f7;
+    color: #101013;
+    border: 0;
+    border-radius: 7px;
+    padding: 8px 14px;
+    font-weight: 600;
+}
+QPushButton:hover {
+    background: #dcdce1;
+}
+QPushButton:pressed {
+    background: #c8c8ce;
+}
+QStatusBar {
+    background: #0b0b0d;
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QCheckBox" name="checkBox">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>0</y>
-      <width>131</width>
-      <height>31</height>
-     </rect>
+   <layout class="QVBoxLayout" name="mainLayout">
+    <property name="leftMargin">
+     <number>24</number>
     </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
+    <property name="topMargin">
+     <number>22</number>
     </property>
-    <property name="text">
-     <string>Show Artist Image</string>
+    <property name="rightMargin">
+     <number>24</number>
     </property>
-    <property name="checked">
-     <bool>true</bool>
+    <property name="bottomMargin">
+     <number>18</number>
     </property>
-   </widget>
-   <widget class="QCheckBox" name="checkBox_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>91</width>
-      <height>17</height>
-     </rect>
+    <property name="spacing">
+     <number>14</number>
     </property>
-    <property name="text">
-     <string>Show Buttons</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
+    <item>
+     <widget class="QLabel" name="titleLabel">
+      <property name="text">
+       <string>TIDAL RPC</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="subtitleLabel">
+      <property name="text">
+       <string>Your TIDAL listening activity on Discord</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QFrame" name="statusCard">
+      <layout class="QVBoxLayout" name="statusLayout">
+       <property name="leftMargin">
+        <number>16</number>
+       </property>
+       <property name="topMargin">
+        <number>16</number>
+       </property>
+       <property name="rightMargin">
+        <number>16</number>
+       </property>
+       <property name="bottomMargin">
+        <number>16</number>
+       </property>
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="serviceStatusLayout">
+         <item>
+          <widget class="QLabel" name="tidalNameLabel">
+           <property name="text">
+            <string>TIDAL</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="tidalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="tidalStatusLabel">
+           <property name="text">
+            <string>Starting</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="discordStatusLayout">
+         <item>
+          <widget class="QLabel" name="discordNameLabel">
+           <property name="text">
+            <string>Discord</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="discordSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="rpcStatusLabel">
+           <property name="text">
+            <string>Starting</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QFrame" name="separator">
+         <property name="frameShape">
+          <enum>QFrame::HLine</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Sunken</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="trackLabel">
+         <property name="text">
+          <string>Nothing playing</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="artistLabel">
+         <property name="text">
+          <string>Open TIDAL and start a track</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="overallStatusLabel">
+         <property name="text">
+          <string>Starting…</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="authButton">
+         <property name="text">
+          <string>Sign in to TIDAL</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="settingsGroup">
+      <property name="title">
+       <string>Settings</string>
+      </property>
+      <layout class="QVBoxLayout" name="settingsLayout">
+       <property name="leftMargin">
+        <number>16</number>
+       </property>
+       <property name="topMargin">
+        <number>14</number>
+       </property>
+       <property name="rightMargin">
+        <number>16</number>
+       </property>
+       <property name="bottomMargin">
+        <number>14</number>
+       </property>
+       <item>
+        <widget class="QCheckBox" name="richPresenceCheckBox">
+         <property name="text">
+          <string>Enable Discord Rich Presence</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox">
+         <property name="text">
+          <string>Show artist image</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_2">
+         <property name="text">
+          <string>Show listen buttons</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="startupCheckBox">
+         <property name="text">
+          <string>Start TIDAL RPC when I sign in</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>8</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar">
-   <property name="sizeGripEnabled">
-    <bool>true</bool>
-   </property>
-  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>

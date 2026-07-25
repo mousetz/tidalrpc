@@ -1,16 +1,67 @@
-# **Tidal RPC**
+# TIDAL RPC
 
-Display your currently playing Tidal tracks in Discord with Tidal RPC — a lightweight and seamless Rich Presence integration for Tidal users.
+TIDAL RPC is a compact Windows utility that displays the track playing in the
+TIDAL desktop app as Discord Rich Presence.
 
-## **Features:**
-- Show currently playing track on Discord 🎵
-- Display album art and track details 🖼 
-- Real-time updates when skipping ⏯
-- Lightweight, minimal resource usage ⚡
-- Interactive buttons that let others play the current track with one click 🎹
+## Features
 
-## **How to install:**
-You can download the latest version from the [Releases](https://github.com/mousetz/tidalrpc/releases) page.
+- Detects playing, paused, stopped, and closed TIDAL states.
+- Shows track, artist, album artwork, and optional TIDAL buttons in Discord.
+- Reconnects automatically when Discord opens or restarts.
+- Runs in the system tray when the window is closed.
+- Supports per-user “Start with Windows” in packaged builds.
+- Stores user settings under `%LOCALAPPDATA%\TIDAL RPC`.
+
+TIDAL RPC currently supports Windows 10 and Windows 11. Playback detection uses
+Windows UI Automation and the title of the official TIDAL desktop window.
+
+## Development
+
+Python 3.11 is the supported build version.
+
+```powershell
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python main.py
+```
+
+The first launch opens TIDAL’s device sign-in page. Discord and TIDAL may be
+opened before or after TIDAL RPC.
+
+## Tests
+
+```powershell
+py -3.11 -m py_compile main.py ui.py app_settings.py windows_startup.py
+py -3.11 -m unittest discover -s tests -v
+```
+
+## Build
+
+Build the Windows GUI executable on Windows:
+
+```powershell
+py -3.11 -m PyInstaller --clean --noconfirm tidalrpc.spec
+```
+
+The finished application is written to `dist\TIDAL RPC.exe`. The build has no
+console window and includes the Qt interface and application icons.
+
+“Start TIDAL RPC when I sign in” is intentionally disabled during interpreted
+development so it cannot register a temporary Python command. In the packaged
+application it writes only the `TIDAL RPC` value under the current user’s
+Windows `Run` key.
+
+## Privacy and diagnostics
+
+OAuth session data, settings, and `tidalrpc.log` remain in the current user’s
+application-data directory. Track names are logged only when the detected track
+changes. Tokens are never logged.
+
+Earlier repository revisions tracked a `credentials.ini` file. Any token that
+was committed should be revoked because removing the current file does not erase
+Git history.
 
 ## License
+
 This project is licensed under the MIT License.
