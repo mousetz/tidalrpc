@@ -58,10 +58,6 @@ OAuth session data, settings, and `tidalrpc.log` remain in the current user’s
 application-data directory. Track names are logged only when the detected track
 changes. Tokens are never logged.
 
-Earlier repository revisions tracked a `credentials.ini` file. Any token that
-was committed should be revoked because removing the current file does not erase
-Git history.
-
 ## License
 
 This project is licensed under the MIT License.
