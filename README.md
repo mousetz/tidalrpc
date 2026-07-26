@@ -1,67 +1,164 @@
-# TIDAL RPC
+<p align="center">
+  <img src="tidal_icon.png" alt="TIDAL RPC icon" width="112">
+</p>
 
-TIDAL RPC is a compact Windows utility that displays the track playing in the
-TIDAL desktop app as Discord Rich Presence.
+<h1 align="center">TIDAL RPC</h1>
+
+<p align="center">
+  Display your currently playing TIDAL track as Discord Rich Presence.
+</p>
+
+<p align="center">
+  <img alt="Windows 10 and 11" src="https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?logo=windows&logoColor=white">
+  <img alt="Python 3.11" src="https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white">
+  <a href="LICENSE">
+    <img alt="MIT License" src="https://img.shields.io/badge/License-MIT-green.svg">
+  </a>
+</p>
+
+TIDAL RPC is a compact Windows utility that detects the track playing in the official TIDAL desktop app and displays it on your Discord profile with track information, artwork, playback time, and optional buttons.
+
+## Download
+
+<!-- Keep this section after publishing your first GitHub Release. -->
+
+Download the latest Windows build from the [Releases page](https://github.com/mousetz/tidalrpc/releases/latest).
+
+1. Download `TIDAL RPC.exe`.
+2. Run the application.
+3. Complete the TIDAL device sign-in on first launch.
+4. Open Discord and play a track through the TIDAL desktop app.
+
+No Python installation is required when using the packaged executable.
 
 ## Features
 
-- Detects playing, paused, stopped, and closed TIDAL states.
-- Shows track, artist, album artwork, and optional TIDAL buttons in Discord.
-- Reconnects automatically when Discord opens or restarts.
-- Runs in the system tray when the window is closed.
-- Supports per-user “Start with Windows” in packaged builds.
-- Stores user settings under `%LOCALAPPDATA%\TIDAL RPC`.
+* Detects playing, paused, stopped, and closed TIDAL states.
+* Displays the track title, artist, album artwork, and playback duration.
+* Optionally displays the artist image and TIDAL buttons.
+* Reconnects automatically when Discord opens or restarts.
+* Continues running in the Windows system tray when closed.
+* Supports starting automatically when you sign in to Windows.
+* Stores settings, authentication data, and logs locally.
+* Prevents multiple instances of the application from running simultaneously.
 
-TIDAL RPC currently supports Windows 10 and Windows 11. Playback detection uses
-Windows UI Automation and the title of the official TIDAL desktop window.
+## Requirements
+
+* Windows 10 or Windows 11
+* The official TIDAL desktop application
+* The Discord desktop application
+* A TIDAL account for the initial device sign-in
+
+TIDAL and Discord can be opened before or after TIDAL RPC.
+
+## Usage
+
+Launch TIDAL RPC and begin playing a track in the TIDAL desktop app. Once Discord is detected, your Rich Presence will update automatically.
+
+The application window lets you:
+
+* Enable or disable Rich Presence.
+* Show an artist image alongside the album artwork.
+* Add “Listen on TIDAL” and “Get TIDAL RPC” buttons.
+* Start TIDAL RPC automatically when signing in to Windows.
+
+Closing the window hides TIDAL RPC in the system tray. Use the tray menu to reopen the window, toggle Rich Presence, or quit the application.
+
+## How it works
+
+TIDAL RPC uses Windows UI Automation to inspect the title of the official TIDAL desktop window. When a track is detected, it retrieves its metadata and sends the resulting activity to Discord Rich Presence.
+
+The application does not modify or inject code into either TIDAL or Discord.
+
+Because playback detection depends on the TIDAL desktop window title, major changes to the TIDAL application may temporarily affect detection.
+
+## Troubleshooting
+
+### Waiting for TIDAL
+
+Make sure the official TIDAL desktop application is running and that a track is playing.
+
+### Waiting for Discord
+
+Make sure the Discord desktop application is running. TIDAL RPC will continue attempting to reconnect automatically.
+
+### The application disappeared after closing it
+
+TIDAL RPC continues running in the system tray. Open it by clicking its tray icon or using the tray menu.
+
+### Rich Presence displays incomplete information
+
+Complete the TIDAL device sign-in so the application can retrieve artwork, artist information, duration, and track links.
+
+Diagnostic logs are stored at:
+
+```text
+%LOCALAPPDATA%\TIDAL RPC\tidalrpc.log
+```
 
 ## Development
 
-Python 3.11 is the supported build version.
+Python 3.11 is the supported development and build version.
 
 ```powershell
+git clone https://github.com/mousetz/tidalrpc.git
+cd tidalrpc
+
 py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
+
 python -m pip install -r requirements.txt
 python main.py
 ```
 
-The first launch opens TIDAL’s device sign-in page. Discord and TIDAL may be
-opened before or after TIDAL RPC.
+The first launch opens TIDAL's device sign-in page.
 
-## Tests
+### Tests
 
 ```powershell
 py -3.11 -m py_compile main.py ui.py app_settings.py windows_startup.py
 py -3.11 -m unittest discover -s tests -v
 ```
 
-## Build
+### Build
 
-Build the Windows GUI executable on Windows:
+Build the packaged Windows application on Windows:
 
 ```powershell
 py -3.11 -m PyInstaller --clean --noconfirm tidalrpc.spec
 ```
 
-The finished application is written to `dist\TIDAL RPC.exe`. The build has no
-console window and includes the Qt interface and application icons.
+The executable will be written to:
 
-“Start TIDAL RPC when I sign in” is intentionally disabled during interpreted
-development so it cannot register a temporary Python command. In the packaged
-application it writes only the `TIDAL RPC` value under the current user’s
-Windows `Run` key.
+```text
+dist\TIDAL RPC.exe
+```
 
-## Privacy and diagnostics
+The packaged application includes the Qt interface and application icons and does not open a console window.
 
-OAuth session data, settings, and `tidalrpc.log` remain in the current user’s
-application-data directory. Track names are logged only when the detected track
-changes. Tokens are never logged.
+The “Start TIDAL RPC when I sign in” option is intentionally disabled during interpreted development. In packaged builds, it creates a per-user `TIDAL RPC` entry under the Windows `Run` registry key.
 
-Earlier repository revisions tracked a `credentials.ini` file. Any token that
-was committed should be revoked because removing the current file does not erase
-Git history.
+## Privacy
+
+OAuth session data, application settings, and diagnostic logs remain inside the current user's local application-data directory.
+
+Track information is written to the log only when the detected track changes. Authentication tokens are never intentionally logged.
+
+## Contributing
+
+Bug reports, feature suggestions, and pull requests are welcome through the repository's issue tracker.
+
+When reporting a detection problem, include:
+
+* Your Windows version.
+* Your TIDAL desktop app version.
+* The relevant section of `tidalrpc.log`.
+* A description of the state displayed inside TIDAL RPC.
+
+Do not include authentication tokens or session files.
 
 ## License
 
-This project is licensed under the MIT License.
+TIDAL RPC is available under the [MIT License](LICENSE).
+
+TIDAL RPC is an independent project and is not affiliated with or endorsed by TIDAL or Discord.
