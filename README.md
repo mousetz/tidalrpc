@@ -156,7 +156,6 @@ When reporting a detection problem, include:
 * A description of the state displayed inside TIDAL RPC.
 
 Do not include authentication tokens or session files.
-
 ## License
 
 TIDAL RPC is available under the [MIT License](LICENSE).
