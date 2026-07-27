@@ -5,7 +5,7 @@
 <h1 align="center">TIDAL RPC</h1>
 
 <p align="center">
-  Display your currently playing TIDAL track as Discord Rich Presence.
+  Display your currently playing TIDAL track as Discord Rich Presence on Windows.
 </p>
 
 <p align="center">
