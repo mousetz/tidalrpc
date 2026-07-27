@@ -40,7 +40,10 @@ def check_for_tidal():
         for window in Desktop(backend="uia").windows():
             try:
                 process = psutil.Process(window.process_id())
-                if "tidal" not in process.name().lower():
+                if process.pid == os.getpid():
+                    continue
+                process_name = process.name().casefold().removesuffix(".exe")
+                if process_name != "tidal":
                     continue
                 result["open"] = True
                 title = window.window_text().strip()

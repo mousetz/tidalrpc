@@ -128,6 +128,31 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(states[-1]["tidal_state"], "missing")
         self.assertEqual(states[-1]["discord_state"], "waiting")
 
+    def test_tidal_detection_ignores_the_packaged_app_window(self):
+        own_window = mock.Mock()
+        own_window.process_id.return_value = 100
+        own_window.window_text.return_value = "TIDAL RPC"
+        tidal_window = mock.Mock()
+        tidal_window.process_id.return_value = 200
+        tidal_window.window_text.return_value = "Real Song"
+        tidal_window.is_visible.return_value = False
+
+        def process(process_id):
+            item = mock.Mock()
+            item.pid = process_id
+            item.name.return_value = "TIDAL RPC.exe" if process_id == 100 else "TIDAL.exe"
+            return item
+
+        desktop = mock.Mock()
+        desktop.windows.return_value = [own_window, tidal_window]
+        with mock.patch.object(main, "Desktop", return_value=desktop):
+            with mock.patch.object(main.psutil, "Process", side_effect=process):
+                with mock.patch.object(main.os, "getpid", return_value=101):
+                    state = main.check_for_tidal()
+
+        self.assertTrue(state["playing"])
+        self.assertEqual(state["song_playing"], "Real Song")
+
     def test_close_hides_and_shutdown_stops_the_worker(self):
         class FakeTray:
             hidden = False
