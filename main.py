@@ -1,4 +1,5 @@
 import functools
+import asyncio
 import logging
 import os
 import sys
@@ -86,11 +87,16 @@ class PlaybackWorker(QObject):
         self.reconnect_delay = 5
         self.reconnect_at = 0
         self.last_errors = {}
+        self._smtc_manager = None
+        self._rpc_start_sent = None
+        self._last_smtc_position = None
+        self._last_smtc_time = 0.0
 
     @Slot()
     def start(self):
         logger.info("Application worker started")
         self._create_session()
+        self._init_smtc()
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.poll)
         self.timer.start(POLL_INTERVAL_MS)
@@ -113,6 +119,30 @@ class PlaybackWorker(QObject):
             self._log_once("auth", "TIDAL authentication failed: %s", error)
         if not self.authenticated:
             self.begin_login()
+
+    def _init_smtc(self):
+        try:
+            from winrt.windows.media.control import (
+                GlobalSystemMediaTransportControlsSessionManager,
+            )
+            async def _init():
+                return await GlobalSystemMediaTransportControlsSessionManager.request_async()
+            self._smtc_manager = asyncio.run(_init())
+        except Exception as error:
+            self._log_once("smtc", "SMTC unavailable: %s", error)
+            self._smtc_manager = None
+
+    def _get_smtc_position(self):
+        if not self._smtc_manager:
+            return None
+        try:
+            session = self._smtc_manager.get_current_session()
+            if not session:
+                return None
+            timeline = session.get_timeline_properties()
+            return timeline.position.total_seconds(), timeline.end_time.total_seconds()
+        except Exception:
+            return None
 
     @Slot()
     def begin_login(self):
@@ -210,6 +240,19 @@ class PlaybackWorker(QObject):
                 discord_state = "connected"
                 if track:
                     self._update_rpc(track)
+                    smtc = self._get_smtc_position()
+                    if smtc and self._rpc_start_sent is not None:
+                        pos, _ = smtc
+                        now = time.monotonic()
+                        if self._last_smtc_position is not None:
+                            elapsed = now - self._last_smtc_time
+                            delta = pos - self._last_smtc_position
+                            if delta < -2 or delta > elapsed + 5:
+                                corrected_start = int(time.time()) - int(pos)
+                                self._update_rpc(track, start_override=corrected_start)
+                                print(f"SEEK detected: {self._last_smtc_position:.0f}s -> {int(pos)}s", flush=True)
+                        self._last_smtc_position = pos
+                        self._last_smtc_time = now
                 else:
                     self._clear_presence()
                 if not self.discord_connected:
@@ -300,7 +343,7 @@ class PlaybackWorker(QObject):
             self._handle_rpc_failure(error)
             return False
 
-    def _update_rpc(self, track):
+    def _update_rpc(self, track, start_override=None):
         signature = (
             track["id"],
             track["title"],
@@ -308,9 +351,13 @@ class PlaybackWorker(QObject):
             self.settings["show_artist_image"],
             self.settings["show_buttons"],
         )
-        if signature == self.previous_rpc_signature:
+        if start_override is None and signature == self.previous_rpc_signature:
             return
+        if self.previous_rpc_signature is not None and signature != self.previous_rpc_signature:
+            self._last_smtc_position = None
+            self._last_smtc_time = 0.0
         now = int(time.time())
+        start = start_override if start_override is not None else now
         payload = {
             "activity_type": pypresence.ActivityType.LISTENING,
             "details": str(track["title"])[:128],
@@ -319,8 +366,8 @@ class PlaybackWorker(QObject):
             "large_text": str(track["album"] or "TIDAL")[:128],
             "small_image": track["artist_image"] if self.settings["show_artist_image"] else None,
             "small_text": "TIDAL RPC" if track["artist_image"] else None,
-            "start": now,
-            "end": now + int(track["duration"]) if track["duration"] else None,
+            "start": start,
+            "end": start + int(track["duration"]) if track["duration"] else None,
         }
         if self.settings["show_buttons"]:
             buttons = []
@@ -336,6 +383,7 @@ class PlaybackWorker(QObject):
         try:
             self.rpc.update(**payload)
             self.previous_rpc_signature = signature
+            self._rpc_start_sent = start
             self.presence_active = True
         except Exception as error:
             self._handle_rpc_failure(error)
@@ -350,6 +398,7 @@ class PlaybackWorker(QObject):
             return
         self.presence_active = False
         self.previous_rpc_signature = None
+        self._rpc_start_sent = None
 
     def _handle_rpc_failure(self, error):
         self._log_once("discord", "Discord RPC unavailable: %s", error)
@@ -364,6 +413,7 @@ class PlaybackWorker(QObject):
         self.discord_connected = False
         self.previous_rpc_signature = None
         self.presence_active = False
+        self._rpc_start_sent = None
         if rpc:
             if clear:
                 try:
