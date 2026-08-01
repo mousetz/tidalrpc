@@ -2,6 +2,7 @@ import functools
 import asyncio
 import logging
 import os
+import re
 import sys
 import time
 
@@ -27,7 +28,66 @@ import windows_startup
 
 CLIENT_ID = 1411287876062416908
 POLL_INTERVAL_MS = 2000
+SEARCH_LIMIT = 10
+_TITLE_SEPARATOR = re.compile(r"\s+[-–—·]\s+")
 logger = logging.getLogger(__name__)
+
+
+def normalize_search_text(text):
+    return re.sub(r"[^a-z0-9]+", " ", (text or "").lower()).strip()
+
+
+def split_window_title(title):
+    return [
+        part.strip()
+        for part in _TITLE_SEPARATOR.split(title or "")
+        if part.strip()
+    ]
+
+
+def score_track(track, segments):
+    name = normalize_search_text(getattr(track, "name", None))
+    artists = ", ".join(
+        artist.name
+        for artist in getattr(track, "artists", None) or []
+        if getattr(artist, "name", None)
+    )
+    artists = normalize_search_text(artists)
+    normalized_segments = [normalize_search_text(segment) for segment in segments]
+
+    score = 0
+    for segment in normalized_segments:
+        if not segment:
+            continue
+        if name == segment:
+            score = max(score, 100)
+        elif name and (name in segment or segment in name):
+            score = max(score, 60)
+    if artists:
+        for segment in normalized_segments:
+            if segment and (
+                artists == segment or artists in segment or segment in artists
+            ):
+                score += 40
+                break
+    return score
+
+
+def pick_best_track(tracks, title):
+    if not tracks:
+        return None
+    segments = split_window_title(title)
+    best = tracks[0]
+    best_score = score_track(best, segments)
+    best_popularity = getattr(best, "popularity", 0) or 0
+    for track in tracks[1:]:
+        score = score_track(track, segments)
+        popularity = getattr(track, "popularity", 0) or 0
+        if score > best_score or (score == best_score and popularity > best_popularity):
+            best = track
+            best_score = score
+            best_popularity = popularity
+    return best
 
 
 def normalize_external_url(url):
@@ -284,12 +344,14 @@ class PlaybackWorker(QObject):
         if time.monotonic() < self.metadata_retry_at:
             return fallback
         try:
+            segments = split_window_title(title)
+            query = segments[0] if segments else title
             results = self.session.search(
-                title,
+                query,
                 models=[tidalapi.media.Track],
-                limit=5,
+                limit=SEARCH_LIMIT,
             )
-            song = results.get("tracks", [None])[0] if results.get("tracks") else None
+            song = pick_best_track(results.get("tracks") or [], title)
             if not song:
                 self.metadata_retry_at = time.monotonic() + 10
                 return fallback
