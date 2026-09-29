@@ -32,16 +32,17 @@ class TidalListener : NotificationListenerService() {
             )
             handler!!.post { syncSessions() }
         } catch (_: SecurityException) {
-            AppRuntime.onPlayback(null, "Notification access needed")
+            stop()
         }
     }
 
     @Synchronized private fun syncSessions() {
+        if (handler == null) return
         val sessions = try {
             manager?.getActiveSessions(ComponentName(this, TidalListener::class.java)).orEmpty()
                 .filter { it.packageName == "com.aspiro.tidal" }
         } catch (_: SecurityException) {
-            AppRuntime.onPlayback(null, "Notification access needed")
+            stop()
             return
         }
         val next = sessions.firstOrNull {
@@ -60,6 +61,7 @@ class TidalListener : NotificationListenerService() {
     }
 
     @Synchronized private fun syncPlayback() {
+        if (handler == null) return
         val controller = selected ?: run {
             AppRuntime.onPlayback(null, "Waiting for TIDAL")
             return
@@ -79,15 +81,19 @@ class TidalListener : NotificationListenerService() {
             AppRuntime.onPlayback(null, "Waiting for track metadata")
             return
         }
-        val image = metadata.getString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI)
-            ?: metadata.getString(MediaMetadata.METADATA_KEY_ART_URI)
+        val mediaId = metadata.getString(MediaMetadata.METADATA_KEY_MEDIA_ID)
         val track = Track(
             title = title,
             artist = metadata.getString(MediaMetadata.METADATA_KEY_ARTIST).orEmpty().ifBlank { "Unknown artist" },
             album = metadata.getString(MediaMetadata.METADATA_KEY_ALBUM),
             durationMs = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION).takeIf { it > 0 },
-            mediaId = metadata.getString(MediaMetadata.METADATA_KEY_MEDIA_ID),
-            albumImage = image?.takeIf { it.startsWith("https://") },
+            mediaId = mediaId,
+            albumImage = metadataImageUrl(
+                metadata.getString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI),
+                metadata.getString(MediaMetadata.METADATA_KEY_ART_URI),
+                metadata.getString(MediaMetadata.METADATA_KEY_DISPLAY_ICON_URI),
+            ),
+            url = tidalTrackUrl(mediaId),
         )
         AppRuntime.onPlayback(
             Playback(
@@ -108,14 +114,17 @@ class TidalListener : NotificationListenerService() {
     }
 
     @Synchronized private fun stop() {
+        if (thread == null) return
         selected?.let { old -> callback?.let { old.unregisterCallback(it) } }
         selected = null
         callback = null
         sessionsChanged?.let { manager?.removeOnActiveSessionsChangedListener(it) }
         sessionsChanged = null
+        manager = null
         handler = null
         thread?.quitSafely()
         thread = null
         AppRuntime.onPlayback(null, "Playback access disconnected")
+        AppRuntime.refreshPermission()
     }
 }

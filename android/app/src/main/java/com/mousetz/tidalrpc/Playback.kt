@@ -1,5 +1,6 @@
 package com.mousetz.tidalrpc
 
+import java.net.URI
 import kotlin.math.abs
 
 data class Track(
@@ -9,7 +10,6 @@ data class Track(
     val durationMs: Long?,
     val mediaId: String?,
     val albumImage: String? = null,
-    val artistImage: String? = null,
     val url: String? = null,
 ) {
     val key: String get() = listOf(mediaId, title, artist, durationMs).joinToString("|")
@@ -23,6 +23,20 @@ data class Playback(
 )
 
 data class Timestamps(val startSeconds: Long, val endSeconds: Long?)
+
+internal fun metadataImageUrl(vararg candidates: String?): String? {
+    for (raw in candidates) {
+        val value = raw?.trim().orEmpty()
+        if (value.length !in 1..300) continue
+        val uri = runCatching { URI(value) }.getOrNull() ?: continue
+        if (uri.scheme.equals("https", true) && !uri.host.isNullOrBlank()) return value
+    }
+    return null
+}
+
+internal fun tidalTrackUrl(mediaId: String?): String? = mediaId
+    ?.takeIf { it.isNotEmpty() && it.all { digit -> digit in '0'..'9' } }
+    ?.let { "https://tidal.com/browse/track/$it" }
 
 internal fun positionAt(playback: Playback, nowElapsedMs: Long): Long {
     val elapsed = (nowElapsedMs - playback.updatedElapsedMs).coerceAtLeast(0)

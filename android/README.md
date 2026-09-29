@@ -6,17 +6,17 @@ The Android app watches the official TIDAL media session and publishes a Listeni
 
 Install Android Studio with Android SDK 36, NDK `27.0.12077973`, and CMake `3.22.1`. Download Discord Social SDK **1.10.18247 or newer** from the Discord Developer Portal for the Discord application used by the Windows app. Place its release `discord_partner_sdk.aar` at `app/libs/discord_partner_sdk.aar` (from this checkout's `../discord_social_sdk/lib/release/` if present). The SDK binary is intentionally excluded from Git.
 
-Register `com.mousetz.tidalrpc://oauth/callback` as a redirect URI for your TIDAL developer application. The repository includes the public TIDAL client ID. To use another application, override it with `-PtidalClientId=YOUR_CLIENT_ID`. Never put a client secret in the APK. Build with:
+No TIDAL developer account or client ID is needed. Build with:
 
 ```sh
 ./gradlew :app:assembleDebug
 ```
 
-The installable APK is `app/build/outputs/apk/debug/app-debug.apk`. The app still sends title, artist, and timing without TIDAL sign-in; sign-in enables verified track links and catalog artwork. Upload an image named `hightide_x1024` to the Discord application's Rich Presence assets for the fallback icon.
+The installable APK is `app/build/outputs/apk/debug/app-debug.apk`. The app uses TIDAL's Android media metadata for title, artist, artwork URL, and playback timing. If TIDAL provides only local bitmap artwork, Discord cannot fetch it as an external image; upload an image named `hightide_x1024` to the Discord application's Rich Presence assets for that fallback. A TIDAL track link is added when the media ID is numeric.
 
 ## Phone setup
 
-Install the official TIDAL and Discord apps and sign in to Discord. Open TIDAL RPC and grant Notification access so Android can expose TIDAL's media session. On some sideloaded Android 13+ devices, first open **App info → More → Allow restricted settings**. Sign in to TIDAL from TIDAL RPC for artwork and links.
+Install the official TIDAL and Discord apps and sign in to Discord. Open TIDAL RPC and grant Notification access so Android can expose TIDAL's media session. On some sideloaded Android 13+ devices, first open **App info → More → Allow restricted settings**.
 
 The app clears presence when TIDAL pauses or stops, notification access is revoked, or Rich Presence is disabled. Android may stop third-party background processes on some devices; screen-off and reboot reliability must be checked on a physical phone. A foreground service is the agreed fallback if the listener alone proves insufficient.
 
@@ -24,4 +24,4 @@ Check on a phone: start and pause playback, skip and seek, change playback speed
 
 ## Google Play later
 
-The project already targets API 36. For a Play release, configure your own signing key, build an AAB with `:app:bundleRelease`, provide a privacy policy describing Notification access, and review the current Play permission requirements. Do not commit the signing key, TIDAL tokens, or Discord SDK binary.
+The project already targets API 36. For a Play release, configure your own signing key, build an AAB with `:app:bundleRelease`, provide a privacy policy describing Notification access, and review the current Play permission requirements. Do not commit the signing key or Discord SDK binary.

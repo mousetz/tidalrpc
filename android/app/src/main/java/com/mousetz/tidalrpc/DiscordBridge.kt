@@ -9,7 +9,7 @@ object DiscordBridge {
 
     private external fun nativeStart(appId: Long)
     private external fun nativeUpdate(
-        title: String, artist: String, album: String?, largeImage: String?, smallImage: String?,
+        title: String, artist: String, album: String?, largeImage: String?,
         startMs: Long, endMs: Long, url: String?, showButtons: Boolean,
     )
     private external fun nativePump(): Int
@@ -20,7 +20,7 @@ object DiscordBridge {
     private var active: Playback? = null
     private var shown: Track? = null
     private var lastPublished: Playback? = null
-    private var lastOptions = ""
+    private var lastShowButtons = false
     private var retryMs = 5_000L
     private var nextRetry = 0L
     private var lastSentAt = 0L
@@ -69,34 +69,33 @@ object DiscordBridge {
         }
     }
 
-    fun show(playback: Playback?, track: Track?, showArtist: Boolean, showButtons: Boolean) {
+    fun show(playback: Playback?, showButtons: Boolean) {
         handler.post {
-            if (playback == null || track == null) {
+            if (playback == null) {
                 clearOnThread()
                 return@post
             }
-            val options = "$showArtist|$showButtons"
-            val visibleTrack = track.copy(artistImage = track.artistImage.takeIf { showArtist })
+            val track = playback.track
             val changed = isNewMoment(lastPublished, playback, SystemClock.elapsedRealtime()) ||
-                visibleTrack != shown || options != lastOptions
+                track != shown || showButtons != lastShowButtons
             active = playback
-            shown = visibleTrack
-            lastOptions = options
-            if (changed) send(showButtons)
+            shown = track
+            lastShowButtons = showButtons
+            if (changed) send()
             handler.removeCallbacks(pump)
             handler.post(pump)
         }
     }
 
-    private fun send(showButtons: Boolean = lastOptions.endsWith("true")) {
+    private fun send() {
         val playback = active ?: return
         val track = shown ?: return
         nativeStart(1411287876062416908L)
         val time = timestamps(playback, SystemClock.elapsedRealtime(), System.currentTimeMillis())
         nativeUpdate(
-            track.title, track.artist, track.album, track.albumImage, track.artistImage,
+            track.title, track.artist, track.album, track.albumImage,
             time.startSeconds * 1_000, (time.endSeconds ?: 0) * 1_000,
-            track.url, showButtons,
+            track.url, lastShowButtons,
         )
         lastPublished = playback
         lastSentAt = SystemClock.elapsedRealtime()
@@ -111,6 +110,7 @@ object DiscordBridge {
         active = null
         shown = null
         lastPublished = null
+        lastShowButtons = false
         connected = false
         nextRetry = 0
         retryMs = 5_000

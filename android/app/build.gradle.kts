@@ -3,11 +3,6 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
-val tidalClientId = providers.gradleProperty("tidalClientId").orElse("orgBtxBKnY6lSmjP").get()
-require(tidalClientId.matches(Regex("[A-Za-z0-9_-]*"))) {
-    "tidalClientId must contain only letters, digits, underscores, or hyphens"
-}
-
 android {
     namespace = "com.mousetz.tidalrpc"
     compileSdk = 36
@@ -19,7 +14,6 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-        buildConfigField("String", "TIDAL_CLIENT_ID", "\"$tidalClientId\"")
         externalNativeBuild {
             cmake {
                 cppFlags += "-std=c++17"
@@ -35,10 +29,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    buildFeatures {
-        buildConfig = true
-        prefab = true
-    }
+    buildFeatures { prefab = true }
 
     externalNativeBuild {
         cmake {
@@ -50,7 +41,6 @@ android {
 
 dependencies {
     implementation(files("libs/discord_partner_sdk.aar"))
-    implementation("com.tidal.sdk:tidalapi:0.3.57")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     testImplementation("junit:junit:4.13.2")
 }

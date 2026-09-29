@@ -24,4 +24,15 @@ class PlaybackTest {
         assertTrue(isNewMoment(before, Playback(track.copy(mediaId = "456"), 0, 11_000, 1f), 11_000))
         assertTrue(isNewMoment(before, Playback(track, 40_000, 11_000, 2f), 11_000))
     }
+
+    @Test fun artworkUsesTheFirstPublicMetadataUrl() {
+        assertEquals("https://images.example.com/cover.jpg", metadataImageUrl(
+            "content://tidal/cover", "https://images.example.com/cover.jpg"))
+        assertEquals(null, metadataImageUrl("file:///private/cover.jpg", "https://"))
+    }
+
+    @Test fun linksRequireATidalTrackId() {
+        assertEquals("https://tidal.com/browse/track/123", tidalTrackUrl("123"))
+        assertEquals(null, tidalTrackUrl("track:123"))
+    }
 }

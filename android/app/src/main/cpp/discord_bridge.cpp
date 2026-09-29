@@ -46,7 +46,7 @@ Java_com_mousetz_tidalrpc_DiscordBridge_nativeStart(JNIEnv *, jobject, jlong app
 extern "C" JNIEXPORT void JNICALL
 Java_com_mousetz_tidalrpc_DiscordBridge_nativeUpdate(
     JNIEnv *env, jobject, jstring title, jstring artist, jstring album,
-    jstring largeImage, jstring smallImage, jlong startMs, jlong endMs,
+    jstring largeImage, jlong startMs, jlong endMs,
     jstring url, jboolean showButtons) {
     if (!client) return;
     discordpp::Activity activity;
@@ -59,11 +59,6 @@ Java_com_mousetz_tidalrpc_DiscordBridge_nativeUpdate(
     auto large = utf8(env, largeImage);
     assets.SetLargeImage(large.empty() ? "hightide_x1024" : large);
     assets.SetLargeText(field(utf8(env, album), "TIDAL"));
-    auto small = utf8(env, smallImage);
-    if (!small.empty()) {
-        assets.SetSmallImage(small);
-        assets.SetSmallText("TIDAL RPC");
-    }
     activity.SetAssets(assets);
 
     if (startMs > 0) {
