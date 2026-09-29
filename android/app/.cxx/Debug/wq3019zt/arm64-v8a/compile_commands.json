@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/Users/petrix/CS/Projects/tidalrpc/android/app/.cxx/Debug/wq3019zt/arm64-v8a",
+  "command": "/tmp/tidalrpc-android-sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=aarch64-none-linux-android33 --sysroot=/tmp/tidalrpc-android-sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Dtidalrpc_bridge_EXPORTS -isystem /private/tmp/tidalrpc-gradle-home/caches/8.13/transforms/f3db0f04ef646f4c873adbe2db394f0c/transformed/discord_partner_sdk/prefab/modules/discord_partner_sdk/include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++17 -fno-limit-debug-info  -fPIC -o CMakeFiles/tidalrpc_bridge.dir/discord_bridge.cpp.o -c /Users/petrix/CS/Projects/tidalrpc/android/app/src/main/cpp/discord_bridge.cpp",
+  "file": "/Users/petrix/CS/Projects/tidalrpc/android/app/src/main/cpp/discord_bridge.cpp"
+}
+]

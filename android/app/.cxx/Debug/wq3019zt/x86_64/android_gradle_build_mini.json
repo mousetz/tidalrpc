@@ -1,0 +1,29 @@
+{
+  "buildFiles": [
+    "/Users/petrix/CS/Projects/tidalrpc/android/app/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/private/tmp/tidalrpc-android-sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/petrix/CS/Projects/tidalrpc/android/app/.cxx/Debug/wq3019zt/x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/private/tmp/tidalrpc-android-sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/petrix/CS/Projects/tidalrpc/android/app/.cxx/Debug/wq3019zt/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "tidalrpc_bridge::@6890427a1f51a3e7e1df": {
+      "artifactName": "tidalrpc_bridge",
+      "abi": "x86_64",
+      "output": "/Users/petrix/CS/Projects/tidalrpc/android/app/build/intermediates/cxx/Debug/wq3019zt/obj/x86_64/libtidalrpc_bridge.so",
+      "runtimeFiles": [
+        "/private/tmp/tidalrpc-gradle-home/caches/8.13/transforms/f3db0f04ef646f4c873adbe2db394f0c/transformed/discord_partner_sdk/prefab/modules/discord_partner_sdk/libs/android.x86_64/libdiscord_partner_sdk.so"
+      ]
+    }
+  }
+}

@@ -138,6 +138,10 @@ The packaged application includes the Qt interface and application icons and doe
 
 The “Start TIDAL RPC when I sign in” option is intentionally disabled during interpreted development. In packaged builds, it creates a per-user `TIDAL RPC` entry under the Windows `Run` registry key.
 
+## Android
+
+An Android 13+ companion is in [`android/`](android/README.md). It reads the TIDAL Android media session and sends on-device Discord Rich Presence. See its README for SDK setup, APK build instructions, and notification-access steps.
+
 ## Privacy
 
 OAuth session data, application settings, and diagnostic logs remain inside the current user's local application-data directory.

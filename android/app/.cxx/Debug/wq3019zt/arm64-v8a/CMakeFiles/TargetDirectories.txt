@@ -1,0 +1,3 @@
+/Users/petrix/CS/Projects/tidalrpc/android/app/.cxx/Debug/wq3019zt/arm64-v8a/CMakeFiles/tidalrpc_bridge.dir
+/Users/petrix/CS/Projects/tidalrpc/android/app/.cxx/Debug/wq3019zt/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/petrix/CS/Projects/tidalrpc/android/app/.cxx/Debug/wq3019zt/arm64-v8a/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,20 @@
+                        -H/Users/petrix/CS/Projects/tidalrpc/android/app/src/main/cpp
+-DCMAKE_SYSTEM_NAME=Android
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-DCMAKE_SYSTEM_VERSION=33
+-DANDROID_PLATFORM=android-33
+-DANDROID_ABI=arm64-v8a
+-DCMAKE_ANDROID_ARCH_ABI=arm64-v8a
+-DANDROID_NDK=/private/tmp/tidalrpc-android-sdk/ndk/27.0.12077973
+-DCMAKE_ANDROID_NDK=/private/tmp/tidalrpc-android-sdk/ndk/27.0.12077973
+-DCMAKE_TOOLCHAIN_FILE=/private/tmp/tidalrpc-android-sdk/ndk/27.0.12077973/build/cmake/android.toolchain.cmake
+-DCMAKE_MAKE_PROGRAM=/private/tmp/tidalrpc-android-sdk/cmake/3.22.1/bin/ninja
+-DCMAKE_CXX_FLAGS=-std=c++17
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/Users/petrix/CS/Projects/tidalrpc/android/app/build/intermediates/cxx/Debug/wq3019zt/obj/arm64-v8a
+-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/Users/petrix/CS/Projects/tidalrpc/android/app/build/intermediates/cxx/Debug/wq3019zt/obj/arm64-v8a
+-DCMAKE_BUILD_TYPE=Debug
+-DCMAKE_FIND_ROOT_PATH=/Users/petrix/CS/Projects/tidalrpc/android/app/.cxx/Debug/wq3019zt/prefab/arm64-v8a/prefab
+-B/Users/petrix/CS/Projects/tidalrpc/android/app/.cxx/Debug/wq3019zt/arm64-v8a
+-GNinja
+                        Build command args: []
+                        Version: 2

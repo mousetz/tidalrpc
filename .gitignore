@@ -151,3 +151,15 @@ cython_debug/
 
 # Custom
 credentials.ini
+
+# Android local inputs and outputs
+.DS_Store
+android/.gradle/
+android/.cxx/
+android/build/
+android/app/build/
+android/local.properties
+android/app/libs/*.aar
+/discord_social_sdk/
+android/*.jks
+android/*.keystore

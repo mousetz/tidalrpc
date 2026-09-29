@@ -1,0 +1,5 @@
+# ninja log v5
+0	1089	1790638874327807717	CMakeFiles/tidalrpc_bridge.dir/discord_bridge.cpp.o	e6e441d0e3129c3a
+1090	1140	1790638874407010378	/Users/petrix/CS/Projects/tidalrpc/android/app/build/intermediates/cxx/Debug/wq3019zt/obj/arm64-v8a/libtidalrpc_bridge.so	8776d8dfc0443913
+2	1005	1790640214979252409	CMakeFiles/tidalrpc_bridge.dir/discord_bridge.cpp.o	e6e441d0e3129c3a
+1005	1106	1790640215086005993	/Users/petrix/CS/Projects/tidalrpc/android/app/build/intermediates/cxx/Debug/wq3019zt/obj/arm64-v8a/libtidalrpc_bridge.so	8776d8dfc0443913
