@@ -1,0 +1,9 @@
+<resources>
+    <style name="TidalRpcTheme" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:colorAccent">#129cff</item>
+        <item name="android:statusBarColor">#0b0b0d</item>
+        <item name="android:navigationBarColor">#0b0b0d</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+</resources>

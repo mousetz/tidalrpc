@@ -11,10 +11,11 @@
 
     <application
         android:allowBackup="false"
-        android:icon="@drawable/tidal_icon"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
         android:label="TIDAL RPC"
         android:usesCleartextTraffic="false"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        android:theme="@style/TidalRpcTheme">
         <activity android:name="com.discord.socialsdk.AuthenticationActivity" tools:node="remove" />
         <service android:name="com.discord.socialsdk.ForegroundService" tools:node="remove" />
         <activity
