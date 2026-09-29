@@ -12,7 +12,7 @@ No TIDAL developer account or client ID is needed. Build with:
 ./gradlew :app:assembleDebug
 ```
 
-The installable APK is `app/build/outputs/apk/debug/app-debug.apk`. The app uses TIDAL's Android media metadata for title, artist, artwork URL, and playback timing. If TIDAL provides only local bitmap artwork, Discord cannot fetch it as an external image; upload an image named `hightide_x1024` to the Discord application's Rich Presence assets for that fallback. A TIDAL track link is added when the media ID is numeric.
+The debug APK is `app/build/outputs/apk/debug/app-debug.apk`. It is signed for local testing; before publishing an APK, bump `versionCode` and `versionName` in `app/build.gradle.kts` and configure a persistent release key. The app uses TIDAL's Android media metadata for title, artist, artwork URL, and playback timing. If TIDAL provides only local bitmap artwork, Discord cannot fetch it as an external image; upload an image named `hightide_x1024` to the Discord application's Rich Presence assets for that fallback. A TIDAL track link is added when the media ID is numeric.
 
 ## Phone setup
 
